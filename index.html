@@ -16,6 +16,15 @@
 </head>
 <body>
 
+  <script>
+    // التعديل الأول: التحويل الفوري لصفحة الأدمن إذا فُتح الرابط بدون معرّف الفعالية الخاص بالطلاب
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventName = urlParams.get('event');
+    if (!eventName) {
+      window.location.href = "admin.html";
+    }
+  </script>
+
   <div class="container my-4">
     <div class="row justify-content-center">
       <div class="col-md-6">
@@ -29,7 +38,6 @@
           <div class="text-center mb-4">
             <h3 class="fw-bold text-dark">تسجيل حضور الفعالية</h3>
             <div id="eventBadge" class="badge bg-success fs-6 mt-2 d-none"></div>
-            <div id="noEventAlert" class="alert alert-danger d-none mt-2">عذراً، يجب الدخول عبر الرابط المخصص للفعالية.</div>
           </div>
           
           <form id="registrationForm">
@@ -84,9 +92,8 @@
   </div>
 
   <script>
+    // ضع هنا رابط الـ Web App الخاص بك من جوجل
     const API_URL = "https://script.google.com/macros/s/AKfycby-XN6KRKRc8Nvo9YuA4cekCkPOgnc4qQV_MTXqb3vnIdadwSAHd9WoWvRYjR_onOvx/exec";
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventName = urlParams.get('event');
     
     document.getElementById('date').value = new Date().toISOString().substring(0, 10);
     
@@ -94,9 +101,6 @@
       const badge = document.getElementById('eventBadge');
       badge.innerText = decodeURIComponent(eventName);
       badge.classList.remove('d-none');
-    } else {
-      document.getElementById('noEventAlert').classList.remove('d-none');
-      document.getElementById('registrationForm').classList.add('d-none');
     }
     
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
