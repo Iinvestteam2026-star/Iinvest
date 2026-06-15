@@ -3,41 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة تحكم الإدارة</title>
+  <title>لوحة تحكم الإدارة الآمنة</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
   <style>
     body { background-color: #f1f3f5; font-family: 'Segoe UI', sans-serif; }
     .sidebar { background-color: #212529; color: white; min-height: 100vh; padding: 20px; }
     .card-stat { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); }
+    /* شاشة الـ Login الرائعة */
+    #loginOverlay { position: fixed; top:0; left:0; width:100%; height:100%; background:#2c3e50; z-index:9999; display:flex; justify-content:center; align-items:center; }
+    .login-box { background:white; padding:40px; border-radius:16px; width:100%; max-width:400px; box-shadow:0 10px 25px rgba(0,0,0,0.2); }
   </style>
 </head>
 <body>
 
-  <div class="container-fluid">
+  <div id="loginOverlay">
+    <div class="login-box">
+      <h3 class="fw-bold text-center mb-4 text-dark">🔐 تسجيل دخول النظام</h3>
+      <form id="loginForm">
+        <div class="mb-3">
+          <label class="form-label small fw-bold">اسم المستخدم</label>
+          <input type="text" id="loginUser" class="form-control" required placeholder="اسم المستخدم">
+        </div>
+        <div class="mb-4">
+          <label class="form-label small fw-bold">كلمة المرور</label>
+          <input type="password" id="loginPass" class="form-control" required placeholder="••••••••">
+        </div>
+        <button type="submit" id="loginBtn" class="btn btn-primary w-100 fw-bold py-2">دخول لوحة التحكم</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="container-fluid d-none" id="mainDashboard">
     <div class="row">
       
       <div class="col-md-3 sidebar">
-        <h4 class="text-center mb-4 fw-bold text-success">نظام إدارة الفعاليات</h4>
+        <h4 class="text-center mb-1 fw-bold text-success">إدارة الفعاليات</h4>
+        <div class="text-center text-muted small mb-4" id="welcomeUser"></div>
         <hr>
-        <h6 class="fw-bold text-light mb-3">➕ إنشاء فعالية جديدة</h6>
-        <form id="newEventForm">
-          <div class="mb-2"><input type="text" id="eventUni" class="form-control form-control-sm" placeholder="اسم الجامعة" required></div>
-          <div class="mb-2"><input type="text" id="eventDate" class="form-control form-control-sm" placeholder="التاريخ (مثال: 14-06-2026)" required></div>
-          <div class="mb-2"><input type="text" id="lectureName" class="form-control form-control-sm" placeholder="اسم المحاضرة" required></div>
-          <div class="mb-2"><input type="text" id="templateId" class="form-control form-control-sm" placeholder="ID قالب الشهادة من Google Slides" required></div>
-          <button type="submit" id="createBtn" class="btn btn-success btn-sm w-100 fw-bold">إنشاء الفعالية</button>
-        </form>
-        <div id="linkOutput" class="mt-3 text-break"></div>
-        <hr>
+        
+        <div id="createEventSection">
+          <h6 class="fw-bold text-light mb-3">➕ إنشاء فعالية جديدة</h6>
+          <form id="newEventForm">
+            <div class="mb-2"><input type="text" id="eventUni" class="form-control form-control-sm" placeholder="اسم الجامعة" required></div>
+            <div class="mb-2"><input type="text" id="eventDate" class="form-control form-control-sm" placeholder="التاريخ (مثال: 14-06-2026)" required></div>
+            <div class="mb-2"><input type="text" id="lectureName" class="form-control form-control-sm" placeholder="اسم المحاضرة" required></div>
+            <div class="mb-2"><input type="text" id="templateId" class="form-control form-control-sm" placeholder="ID قالب الشهادة من Google Slides" required></div>
+            <button type="submit" id="createBtn" class="btn btn-success btn-sm w-100 fw-bold">إنشاء الفعالية</button>
+          </form>
+          <div id="linkOutput" class="mt-3 text-break"></div>
+          <hr>
+        </div>
+
+        <div id="addUserSection" class="d-none">
+          <h6 class="fw-bold text-warning mb-3">👥 إضافة مسؤول جديد</h6>
+          <form id="newUserForm">
+            <div class="mb-2"><input type="text" id="newUsername" class="form-control form-control-sm" placeholder="اسم مستخدم جديد" required></div>
+            <div class="mb-2"><input type="password" id="newPassword" class="form-control form-control-sm" placeholder="كلمة مرور جديدة" required></div>
+            <div class="mb-2">
+              <select id="newRole" class="form-select form-select-sm" required>
+                <option value="all">كل الصلاحيات (إنشاء وعرض)</option>
+                <option value="create">إنشاء فعاليات فقط</option>
+                <option value="view">اطّلاع وعرض كشوفات فقط</option>
+              </select>
+            </div>
+            <button type="submit" id="addUserBtn" class="btn btn-warning btn-sm w-100 fw-bold text-dark">إضافة المسؤول</button>
+          </form>
+          <hr>
+        </div>
+
         <h6 class="fw-bold text-light mb-2">📂 اختر الفعالية الحالية</h6>
         <select id="eventSelector" class="form-select form-select-sm" onchange="loadEventData()">
-          <option value="">اختر الفعالية...</option>
+          <option value="all">📊 كل الفعاليات المسجلة (عرض مجمع)</option>
         </select>
       </div>
 
       <div class="col-md-9 p-4">
-        <h2 class="fw-bold mb-4" id="dashboardTitle">لوحة التحليلات والإحصاء الفوري</h2>
+        <h2 class="fw-bold mb-2" id="dashboardTitle">📊 كل الفعاليات المسجلة (عرض مجمع)</h2>
         
+        <div id="retrievedLinkBox" class="alert alert-info p-2 small d-none mb-3 d-flex justify-content-between align-items-center">
+          <div><strong>رابط تسجيل الحضور للطلاب الخاص بهذه الفعالية:</strong><br><span id="retrievedLinkText"></span></div>
+          <button class="btn btn-sm btn-outline-primary fw-bold" onclick="copyRetrievedLink()">📋 نسخ الرابط</button>
+        </div>
+
         <div class="row mb-4">
           <div class="col-md-3">
             <div class="card card-stat p-3 bg-white text-center"><h6>إجمالي الحاضرين</h6><h2 class="fw-bold text-primary" id="statTotal">0</h2></div>
@@ -58,13 +105,13 @@
 
         <div class="card card-stat p-3">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5 class="fw-bold m-0">قائمة الطلاب المسجلين</h5>
+            <h5 class="fw-bold m-0" id="tableTitle">قائمة الطلاب المجمعة</h5>
             <input type="text" id="searchBox" class="form-control w-25" placeholder="بحث بالاسم أو الهاتف..." onkeyup="filterTable()">
           </div>
           <div class="table-responsive">
             <table class="table table-striped table-hover align-middle">
               <thead><tr><th>م</th><th>الاسم</th><th>النوع</th><th>الهاتف</th><th>الجامعة</th><th>الكلية</th><th>الفرقة</th><th>التاريخ</th></tr></thead>
-              <tbody id="tableBody"><tr><td colspan="8" class="text-center text-muted">الرجاء اختيار فعالية من القائمة الجانبية أولاً</td></tr></tbody>
+              <tbody id="tableBody"><tr><td colspan="8" class="text-center text-muted">جاري تحميل البيانات الإحصائية...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -74,9 +121,55 @@
   </div>
 
   <script>
+    // ضع هنا رابط الـ Web App الخاص بك من جوجل شيت
     const API_URL = "https://script.google.com/macros/s/AKfycby-XN6KRKRc8Nvo9YuA4cekCkPOgnc4qQV_MTXqb3vnIdadwSAHd9WoWvRYjR_onOvx/exec";
+    
+    let currentAdminUser = "";
+    let currentAdminPass = "";
+    let currentRole = "";
 
-    window.onload = function() {
+    // التحقق من تسجيل الدخول
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const loginBtn = document.getElementById('loginBtn');
+      loginBtn.disabled = true; loginBtn.innerText = "جاري التحقق الحماية...";
+      
+      currentAdminUser = document.getElementById('loginUser').value;
+      currentAdminPass = document.getElementById('loginPass').value;
+      
+      fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "login", username: currentAdminUser, password: currentAdminPass })
+      })
+      .then(res => res.json())
+      .then(res => {
+        loginBtn.disabled = false; loginBtn.innerText = "دخول لوحة التحكم";
+        if (res.status === "success") {
+          currentRole = res.role;
+          document.getElementById('loginOverlay').classList.add('d-none');
+          document.getElementById('mainDashboard').classList.remove('d-none');
+          document.getElementById('welcomeUser').innerText = `المسؤول المتصل: ${res.username}`;
+          
+          // تطبيق الصلاحيات المحمية
+          if (currentRole === "view") {
+            document.getElementById('createEventSection').classList.add('d-none');
+          }
+          if (currentRole === "all") {
+            document.getElementById('addUserSection').classList.remove('d-none');
+          }
+          
+          initDashboard();
+        } else {
+          alert(res.message);
+        }
+      }).catch(err => {
+        loginBtn.disabled = false; loginBtn.innerText = "دخول لوحة التحكم";
+        alert("حدث خطأ في الشبكة.");
+      });
+    });
+
+    // تحميل الفعاليات والعرض المجمع المبدئي أول فتح السيستم
+    function initDashboard() {
       fetch(`${API_URL}?action=getEvents`)
       .then(res => res.json())
       .then(events => {
@@ -86,11 +179,40 @@
           opt.value = ev; opt.innerText = ev;
           selector.appendChild(opt);
         });
-      }).catch(err => console.error("Error fetching events:", err));
-    };
+        loadEventData(); // عرض مجمع لـ "كل الفعاليات" افتراضياً
+      }).catch(err => console.error(err));
+    }
 
+    // إضافة مسؤول جديد بصلاحيات
+    document.getElementById('newUserForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = document.getElementById('addUserBtn');
+      btn.disabled = true; btn.innerText = "جاري الإضافة...";
+      
+      const payload = {
+        action: "addUser",
+        adminUser: currentAdminUser,
+        adminPass: currentAdminPass,
+        newUsername: document.getElementById('newUsername').value,
+        newPassword: document.getElementById('newPassword').value,
+        newRole: document.getElementById('newRole').value
+      };
+
+      fetch(API_URL, { method: "POST", body: JSON.stringify(payload) })
+      .then(res => res.json())
+      .then(res => {
+        btn.disabled = false; btn.innerText = "إضافة المسؤول";
+        alert(res.message);
+        if (res.status === "success") {
+          document.getElementById('newUserForm').reset();
+        }
+      }).catch(err => { btn.disabled = false; alert("خطأ اتصال."); });
+    });
+
+    // إنشاء فعالية جديدة
     document.getElementById('newEventForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      if(currentRole === "view") { alert("حسابك لا يملك صلاحية إنشاء فعاليات."); return; }
       const createBtn = document.getElementById('createBtn');
       createBtn.disabled = true; createBtn.innerText = "جاري الإنشاء...";
 
@@ -107,34 +229,48 @@
       .then(res => {
         createBtn.disabled = false; createBtn.innerText = "إنشاء الفعالية";
         if (res.status === 'success') {
-          // جلب رابط جيت هاب الحالي ديناميكياً بدون أخطاء تكرار امتدادات
           const baseUrl = window.location.href.split('/admin.html')[0];
           const studentRegLink = `${baseUrl}/index.html?event=${encodeURIComponent(res.eventName)}`;
           
           document.getElementById('linkOutput').innerHTML = `
             <div class='alert alert-success p-2 small'>
-              🎉 تم إنشاء الفعالية في الشيت وبناء الرابط الجاهز للنشر:<br>
-              <a href='${studentRegLink}' target='_blank' class='fw-bold text-success'>اضغط هنا لفتح رابط تسجيل الطلاب</a>
+              🎉 تم إنشاء الفعالية!<br>
+              <a href='${studentRegLink}' target='_blank' class='fw-bold text-success'>اضغط لفتح رابط الحضور</a>
             </div>`;
           
           const selector = document.getElementById('eventSelector');
           const opt = document.createElement('option');
           opt.value = res.eventName; opt.innerText = res.eventName;
-          selector.appendChild(opt, selector.firstChild);
+          selector.appendChild(opt);
+          document.getElementById('newEventForm').reset();
         } else {
           alert(res.message);
         }
-      }).catch(err => {
-        createBtn.disabled = false; createBtn.innerText = "إنشاء الفعالية";
-        alert("حدث خطأ أثناء الاتصال بالخادم.");
-      });
+      }).catch(err => { createBtn.disabled = false; alert("خطأ بالخادم."); });
     });
 
+    // جلب وعرض البيانات للفعالية المختارة أو للكل
     function loadEventData() {
       const eventName = document.getElementById('eventSelector').value;
-      if (!eventName) return;
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = "<tr><td colspan='8' class='text-center text-muted'>جاري تحديث واسترجاع كشف البيانات الفوري...</td></tr>";
       
-      document.getElementById('dashboardTitle').innerText = "تحليلات: " + eventName;
+      if (eventName === "all") {
+        document.getElementById('dashboardTitle').innerText = "📊 كل الفعاليات المسجلة (عرض مجمع)";
+        document.getElementById('tableTitle').innerText = "قائمة الطلاب المجمعة";
+        document.getElementById('retrievedLinkBox').classList.add('d-none');
+        document.getElementById('pdfBtn').classList.add('d-none');
+      } else {
+        document.getElementById('dashboardTitle').innerText = "تحليلات: " + eventName;
+        document.getElementById('tableTitle').innerText = "كشف حضور: " + eventName;
+        
+        // استرجاع وإعادة بناء الرابط تلقائياً حتى لا يضيع
+        const baseUrl = window.location.href.split('/admin.html')[0];
+        const studentRegLink = `${baseUrl}/index.html?event=${encodeURIComponent(eventName)}`;
+        document.getElementById('retrievedLinkText').innerText = studentRegLink;
+        document.getElementById('retrievedLinkBox').classList.remove('d-none');
+        document.getElementById('pdfBtn').classList.remove('d-none');
+      }
       
       fetch(`${API_URL}?action=getEventData&eventName=${encodeURIComponent(eventName)}`)
       .then(res => res.json())
@@ -142,12 +278,10 @@
         document.getElementById('statTotal').innerText = res.stats.total;
         document.getElementById('statMale').innerText = res.stats.male;
         document.getElementById('statFemale').innerText = res.stats.female;
-        document.getElementById('pdfBtn').classList.remove('d-none');
         
-        const tbody = document.getElementById('tableBody');
         tbody.innerHTML = "";
         if(res.students.length === 0) {
-          tbody.innerHTML = "<tr><td colspan='8' class='text-center text-muted'>لا يوجد مسجلين حتى الآن في هذه الفعالية</td></tr>";
+          tbody.innerHTML = "<tr><td colspan='8' class='text-center text-muted'>لا يوجد أي طالب مسجل هنا حتى الآن.</td></tr>";
           return;
         }
         res.students.forEach(row => {
@@ -158,6 +292,12 @@
           tbody.appendChild(tr);
         });
       });
+    }
+
+    function copyRetrievedLink() {
+      const linkText = document.getElementById('retrievedLinkText').innerText;
+      navigator.clipboard.writeText(linkText);
+      alert("📋 تم نسخ رابط الطلاب المخصص للفعالية بنجاح، يمكنك إرساله لهم الآن!");
     }
 
     function filterTable() {
@@ -171,8 +311,9 @@
 
     function downloadPDFs() {
       const eventName = document.getElementById('eventSelector').value;
+      if (eventName === "all") return;
       const pdfBtn = document.getElementById('pdfBtn');
-      pdfBtn.disabled = true; pdfBtn.innerText = "جاري دمج وتوليد الشهادات...";
+      pdfBtn.disabled = true; pdfBtn.innerText = "جاري سحب وتوليد الشهادات...";
       
       fetch(API_URL, { method: "POST", body: JSON.stringify({ action: "generatePDF", eventName: eventName }) })
       .then(res => res.json())
@@ -183,10 +324,7 @@
         } else {
           alert(res.message);
         }
-      }).catch(err => {
-        pdfBtn.disabled = false; pdfBtn.innerText = "تحميل الـ PDF المجمع";
-        alert("حدثت مشكلة أثناء استخراج الشهادات.");
-      });
+      }).catch(err => { pdfBtn.disabled = false; pdfBtn.innerText = "تحميل الـ PDF المجمع"; alert("خطأ استخراج."); });
     }
   </script>
 </body>
